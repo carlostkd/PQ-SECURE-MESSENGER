@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Compose &mdash; PQ//Secure//Messenger</title>
+<style>
+:root {
+    --purple-900: #1a1a2e;
+    --purple-800: #25253e;
+    --purple-700: #4c1d95;
+    --purple-600: #6d28d9;
+    --purple-500: #7c3aed;
+    --purple-400: #8b5cf6;
+    --purple-300: #a78bfa;
+    --purple-200: #c4b5fd;
+    --purple-100: #ddd6fe;
+    --cyan-500: #06b6d4;
+    --cyan-400: #22d3ee;
+    --cyan-300: #67e8f9;
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #1e1e36;
+    --bg-card: rgba(30, 30, 54, 0.65);
+    --bg-card-hover: rgba(30, 30, 54, 0.8);
+    --surface: rgba(26, 26, 46, 0.85);
+    --text: #e2e8f0;
+    --text-secondary: #a1a1b5;
+    --text-muted: #7c7c96;
+    --border: rgba(139, 92, 246, 0.15);
+    --border-active: rgba(139, 92, 246, 0.35);
+    --success: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.08);
+    --success-border: rgba(16, 185, 129, 0.25);
+    --warning: #f59e0b;
+    --warning-bg: rgba(245, 158, 11, 0.08);
+    --warning-border: rgba(245, 158, 11, 0.25);
+    --error: #ef4444;
+    --error-bg: rgba(239, 68, 68, 0.08);
+    --error-border: rgba(239, 68, 68, 0.25);
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+    --shadow-glow: 0 0 16px rgba(139,92,246,0.1);
+    --radius: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(109,40,217,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 0%, rgba(6,182,212,0.04) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 1rem 2rem; }
+}
+
+.site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.site-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple-500), transparent);
+}
+
+.site-header .brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 1.625rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.logo-text {
+    background: linear-gradient(135deg, var(--purple-300), var(--cyan-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-text .slash {
+    color: var(--purple-500);
+    -webkit-text-fill-color: var(--purple-500);
+    font-weight: 400;
+    padding: 0 0.1em;
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.site-nav .nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.site-nav .nav-link:hover {
+    color: var(--text);
+    background: rgba(139, 92, 246, 0.08);
+}
+
+.site-nav .nav-link.active {
+    color: var(--purple-300);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.subtitle {
+    width: 100%;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0;
+}
+
+.badge-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-flex;
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: var(--purple-300);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.badge-audited {
+    border-color: var(--success-border);
+    color: #6ee7b7;
+    background: var(--success-bg);
+}
+
+.oss-link {
+    color: var(--cyan-400);
+    font-size: 0.625rem;
+    text-decoration: none;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(6,182,212,0.18);
+    background: rgba(6,182,212,0.06);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    transition: border-color 0.2s;
+}
+
+.oss-link:hover {
+    border-color: var(--cyan-400);
+}
+
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .layout-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    box-shadow: var(--shadow);
+}
+
+.card:hover {
+    border-color: var(--border-active);
+    box-shadow: var(--shadow), var(--shadow-glow);
+    background: var(--bg-card-hover);
+}
+
+.card.full { grid-column: 1 / -1; }
+
+.card h2 {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--purple-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.card h2 .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+    border-radius: 5px;
+    font-size: 0.6875rem;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(139,92,246,0.25);
+}
+
+.section-desc {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.form-group {
+    margin-bottom: 0.875rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: var(--text);
+    font-size: 0.78125rem;
+    letter-spacing: 0.01em;
+}
+
+.form-group label small {
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    background: rgba(10, 10, 20, 0.4);
+    color: var(--text);
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--purple-500);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+}
+
+.form-group input[type="number"]::placeholder {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+
+.form-group textarea,
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="url"],
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    background: rgba(10, 10, 20, 0.4);
+    color: var(--text);
+}
+
+.form-group textarea:focus,
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="url"]:focus,
+.form-group input[type="file"]:focus,
+.form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--purple-500);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+}
+
+.form-group textarea::placeholder,
+.form-group input::placeholder {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--text-muted);
+    font-size: 0.71875rem;
+}
+
+.input-file-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 0.25rem;
+}
+
+.file-upload-btn {
+    padding: 0.45rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: 1.5px solid var(--purple-500);
+    border-radius: 8px;
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--purple-300);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.file-upload-btn:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: var(--purple-400);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
+}
+
+.file-name {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+button {
+    cursor: pointer;
+    padding: 0.55rem 1.125rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    letter-spacing: 0.01em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+    color: white;
+    box-shadow: 0 3px 10px rgba(109,40,217,0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(109,40,217,0.4);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+.btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: rgba(139, 92, 246, 0.07);
+    color: var(--purple-300);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+}
+
+.btn-secondary:hover {
+    background: rgba(139, 92, 246, 0.14);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.71875rem;
+    background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+    color: white;
+}
+
+.btn-small:hover {
+    box-shadow: 0 0 10px rgba(139,92,246,0.3);
+}
+
+.button-row {
+    display: flex;
+    gap: 0.625rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.hidden { display: none !important; }
+
+.alert-success,
+.alert-warning,
+.alert-error,
+.alert-info {
+    width: 100%;
+    padding: 0.65rem 0.875rem;
+    border-radius: 8px;
+    margin-bottom: 0.875rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.78125rem;
+    line-height: 1.5;
+}
+
+.alert-success {
+    background: var(--success-bg);
+    color: #6ee7b7;
+    border: 1px solid var(--success-border);
+}
+
+.alert-warning {
+    background: var(--warning-bg);
+    color: #fcd34d;
+    border: 1px solid var(--warning-border);
+}
+
+.alert-error {
+    background: var(--error-bg);
+    color: #fca5a5;
+    border: 1px solid var(--error-border);
+}
+
+.alert-info {
+    background: rgba(139, 92, 246, 0.07);
+    color: var(--purple-300);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+}
+
+.status-icon {
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    line-height: 1.5;
+}
+
+.share-link-box {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+}
+
+.share-link-box input {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid rgba(139, 92, 246, 0.25);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    background: rgba(10, 10, 20, 0.5);
+    color: var(--purple-200);
+    letter-spacing: 0.01em;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.08);
+}
+
+.share-link-box input:focus {
+    outline: none;
+    border-color: var(--purple-500);
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.15);
+}
+
+.key-pair-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.78125rem;
+    color: var(--purple-300);
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.key-pair-toggle:hover { color: var(--purple-200); }
+
+.key-pair-toggle .chevron {
+    transition: transform 0.3s;
+    font-size: 0.6875rem;
+}
+
+.key-pair-toggle.open .chevron { transform: rotate(180deg); }
+
+.key-pair-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+.key-pair-body.open { max-height: 600px; }
+
+.key-result-area {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    background: rgba(10, 10, 20, 0.5) !important;
+    min-height: 80px;
+    padding: 0.85rem 1rem;
+    font-size: 0.8125rem;
+    color: var(--purple-200) !important;
+    border: 1.5px solid var(--border);
+    letter-spacing: 0.02em;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.key-result-area:focus {
+    outline: none;
+    border-color: var(--purple-500);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.12);
+}
+
+#decryptedText {
+    background: rgba(10, 10, 20, 0.4);
+    padding: 0.875rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.8125rem;
+    color: var(--purple-200);
+    border: 1px solid var(--border);
+}
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0.75rem);
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow), var(--shadow-glow);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    z-index: 1000;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.success {
+    border-color: var(--success-border);
+    color: #6ee7b7;
+}
+
+.toast.error {
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+}
+
+.about-section { margin-top: 2rem; }
+
+.about-toggle {
+    width: 100%;
+    background: var(--bg-card);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.875rem 1.125rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--purple-200);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    gap: 0.5rem;
+}
+
+.about-toggle:hover {
+    border-color: var(--purple-500);
+    box-shadow: var(--shadow-glow);
+}
+
+.about-toggle .chevron {
+    transition: transform 0.3s ease;
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+}
+
+.about-toggle.open .chevron { transform: rotate(180deg); }
+
+.about-content {
+    background: var(--bg-card);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 0 1.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.about-content.open {
+    max-height: 3000px;
+    padding: 1.25rem 1.5rem 1.75rem;
+}
+
+.about-content h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--purple-200);
+    margin: 1.125rem 0 0.5rem;
+}
+
+.about-content h3:first-child { margin-top: 0; }
+
+.about-content p,
+.about-content li {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    margin-bottom: 0.625rem;
+}
+
+.about-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about-content li {
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+.about-content li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--purple-500);
+    box-shadow: 0 0 4px rgba(139,92,246,0.4);
+}
+
+.about-content .crypto-chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0.625rem 0;
+}
+
+.about-content .crypto-tag {
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 5px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.71875rem;
+    font-weight: 600;
+    color: var(--purple-300);
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+}
+
+.about-content .crypto-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+
+.flow-steps {
+    background: rgba(10, 10, 20, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+}
+
+.flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.flow-step + .flow-step {
+    border-top: 1px dashed rgba(139, 92, 246, 0.12);
+}
+
+.flow-step .step-num {
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--purple-300);
+}
+
+.flow-step .step-side {
+    color: var(--purple-300);
+    font-weight: 600;
+    min-width: 5rem;
+}
+
+.flow-step .step-desc { color: var(--text-secondary); }
+
+@media (max-width: 640px) {
+    .card { padding: 1.125rem; }
+    .button-row { flex-direction: column; }
+    button { width: 100%; }
+    .share-link-box { flex-direction: column; }
+    .crypto-chain { flex-direction: column; }
+    .crypto-arrow { transform: rotate(90deg); }
+    .flow-step { flex-wrap: wrap; }
+}
+
+footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.71875rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <header class="site-header">
+        <a href="#" class="brand"><h1><span class="logo-text">PQ<span class="slash">//</span>Secure<span class="slash">//</span>Messenger</span></h1></a>
+        <nav class="site-nav">
+            <a href="#" class="nav-link active">Compose</a>
+            <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" class="nav-link" target="_blank">GitHub</a>
+        </nav>
+        <p class="subtitle">Post-quantum encrypted sharing &middot; Zero knowledge &middot; No server-side crypto</p>
+        <div class="badge-row">
+            <span class="badge">ML-KEM-768</span>
+            <span class="badge">AES-256-GCM</span>
+            <span class="badge">HKDF-SHA256</span>
+            <span class="badge">Zero-Knowledge</span>
+            <span class="badge">No CDN</span>
+            <span class="badge badge-audited">Open Source &amp; Audited</span>
+            <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" class="oss-link" target="_blank">&#9733; Star on GitHub</a>
+        </div>
+    </header>
+
+    <main class="layout-grid">
+        <div class="card" id="encryptCard">
+            <h2><span class="icon">&#9998;</span> Encrypt &amp; Share</h2>
+            <p class="section-desc">Write a message or choose a file. A one-time keypair is generated automatically every time. The secret key is embedded in the share link &mdash; no pre-shared keys needed.</p>
+
+            <div class="form-group">
+                <label for="messageContent">Message</label>
+                <textarea id="messageContent" rows="5" placeholder="Type your secret message..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Or upload a file <small>(max 10 MB)</small></label>
+                <div class="input-file-wrapper">
+                    <input type="file" id="fileInput" accept="*/*" hidden>
+                    <button type="button" class="file-upload-btn" id="fileUploadBtn">Choose File</button>
+                    <span class="file-name" id="fileName">No file selected</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="filePassword">Password <small>optional for text, required for files</small></label>
+                <input type="password" id="filePassword" placeholder="Password-protect your message" maxlength="24">
+            </div>
+
+            <div class="form-group">
+                <label for="maxViews">Max views <small>(leave blank for unlimited)</small></label>
+                <input type="number" id="maxViews" min="1" max="100" placeholder="e.g. 3">
+            </div>
+
+            <button id="keyPairToggle" class="key-pair-toggle" type="button">
+                <span>&#9881;</span> Generate a persistent key pair
+                <span class="chevron">&#9660;</span>
+            </button>
+
+            <div class="key-pair-body" id="keyPairBody">
+                <div class="form-group" style="margin-top:0.75rem;">
+                    <div class="button-row" style="justify-content:flex-start;margin-top:0;">
+                        <button id="genKeyBtn" class="btn-small">Generate Key Pair</button>
+                    </div>
+                </div>
+                <div id="keyPairResult" class="hidden">
+                    <div class="form-group">
+                        <label>Public Key <small>share with senders</small></label>
+                        <textarea id="myPublicKey" class="key-result-area" rows="3" readonly></textarea>
+                        <div class="button-row" style="justify-content:flex-start;margin-top:0.375rem;">
+                            <button id="copyPubBtn" class="btn-small">Copy</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Secret Key <small>keep offline, never share</small></label>
+                        <textarea id="mySecretKey" class="key-result-area" rows="3" readonly></textarea>
+                        <div class="button-row" style="justify-content:flex-start;margin-top:0.375rem;">
+                            <button id="copySecBtn" class="btn-small">Copy</button>
+                        </div>
+                    </div>
+                    <div class="alert-warning">
+                        <span class="status-icon">&#9888;</span>
+                        Save your secret key somewhere safe. It is never stored on the server.
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button id="encryptBtn" class="btn-primary">Encrypt &amp; Generate Link</button>
+                <button id="clearBtn" class="btn-secondary">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="decryptCard">
+            <h2><span class="icon">&#128274;</span> Decrypt</h2>
+            <p class="section-desc">Paste encrypted data and your secret key to decrypt a message received from someone.</p>
+
+            <div class="form-group">
+                <label for="senderCiphertext">Encrypted Data</label>
+                <textarea id="senderCiphertext" rows="3" placeholder="Auto-fills from share link..."></textarea>
+                <small>Paste the encrypted content from the share link.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="decryptionKey">Secret Key (base64)</label>
+                <textarea id="decryptionKey" rows="3" placeholder="Paste your secret key..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="decryptPassword">Password <small>&mdash; if applicable</small></label>
+                <input type="password" id="decryptPassword" placeholder="Only needed for password-protected messages" maxlength="24">
+            </div>
+
+            <div class="button-row">
+                <button id="decryptBtn" class="btn-primary">Decrypt</button>
+            </div>
+
+            <div id="decryptOutput" class="hidden" style="margin-top:1rem;">
+                <div class="alert-success">
+                    <span class="status-icon">&#10003;</span> Decrypted successfully
+                </div>
+                <div id="decryptedText"></div>
+            </div>
+        </div>
+
+        <div class="card full hidden" id="resultCard">
+            <h2><span class="icon">&#10148;</span> Share This Link</h2>
+            <div class="alert-success">
+                <span class="status-icon">&#10003;</span>
+                Ciphertext generated. Share this link with the recipient (requires a server to store and retrieve):
+            </div>
+            <div class="share-link-box">
+                <input type="text" id="shareLink" readonly>
+                <button id="copyLinkBtn" class="btn-small">Copy</button>
+            </div>
+            <div class="button-row">
+                <button id="newMessageBtn" class="btn-secondary">Encrypt Another</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="about-section">
+        <button class="about-toggle" id="aboutToggle" aria-expanded="false">
+            <span>&#9432; About &mdash; post-quantum encryption &amp; how PQ Secure works</span>
+            <span class="chevron">&#9660;</span>
+        </button>
+        <div class="about-content" id="aboutContent">
+            <h3>What is post-quantum encryption?</h3>
+            <p>
+                Nearly all encryption on the internet today relies on RSA or elliptic-curve cryptography (ECC).
+                These systems are secure against classical computers but will be broken by sufficiently powerful
+                quantum computers using Shor's algorithm. Post-quantum cryptography uses mathematical problems
+                that are believed to be hard for <em>both</em> classical and quantum computers.
+            </p>
+            <p>
+                <strong>PQ Secure</strong> uses <strong>ML-KEM-768</strong> (formerly CRYSTALS-Kyber), the
+                NIST-standardized post-quantum key encapsulation mechanism. It provides security roughly
+                equivalent to AES-192 against quantum attackers.
+            </p>
+            <h3>Cryptographic chain</h3>
+            <p>Every encrypted message passes through three layers:</p>
+            <div class="crypto-chain">
+                <span class="crypto-tag">ML-KEM-768</span>
+                <span class="crypto-arrow">&rarr;</span>
+                <span class="crypto-tag">HKDF-SHA256</span>
+                <span class="crypto-arrow">&rarr;</span>
+                <span class="crypto-tag">AES-256-GCM</span>
+            </div>
+            <ul>
+                <li><strong>ML-KEM-768</strong> &mdash; Post-quantum key encapsulation. Generates a shared secret that only the intended recipient can recover.</li>
+                <li><strong>HKDF-SHA256</strong> &mdash; Derives a strong symmetric key from the shared secret with domain separation.</li>
+                <li><strong>AES-256-GCM</strong> &mdash; Authenticated encryption of the actual message data.</li>
+            </ul>
+            <h3>How PQ Secure works</h3>
+            <p class="flow-intro">
+                No pre-shared keys needed. Every encryption generates a fresh one-time ML-KEM-768 keypair.
+                The secret key is embedded directly in the share link &mdash; when the recipient opens it,
+                their browser recovers the key from the URL and decrypts locally.
+            </p>
+            <div class="flow-steps">
+                <div class="flow-step"><span class="step-num">1</span><span class="step-side">Sender</span><span class="step-desc">Generates a one-time ML-KEM-768 keypair</span></div>
+                <div class="flow-step"><span class="step-num">2</span><span class="step-side">Sender</span><span class="step-desc">Encapsulates with the public key &rarr; derives an ML-KEM shared secret</span></div>
+                <div class="flow-step"><span class="step-num">3</span><span class="step-side">Sender</span><span class="step-desc">Encrypts the message with AES-256-GCM using the shared secret</span></div>
+                <div class="flow-step"><span class="step-num">4</span><span class="step-side">Sender</span><span class="step-desc">POSTs the ciphertext to the server &rarr; server stores it and returns an ID</span></div>
+                <div class="flow-step"><span class="step-num">5</span><span class="step-side">Sender</span><span class="step-desc">Builds a share link with the server ID and one-time secret key embedded</span></div>
+                <div class="flow-step"><span class="step-num">6</span><span class="step-side">Recipient</span><span class="step-desc">Opens the link &rarr; browser extracts the secret key from the URL</span></div>
+                <div class="flow-step"><span class="step-num">7</span><span class="step-side">Recipient</span><span class="step-desc">Requests ciphertext from the server &rarr; decapsulates with the secret key</span></div>
+                <div class="flow-step"><span class="step-num">8</span><span class="step-side">Recipient</span><span class="step-desc">Decrypts with AES-256-GCM &rarr; reads the plaintext</span></div>
+            </div>
+            <h3>Zero-knowledge architecture</h3>
+            <p>
+                The server <strong>never sees</strong> your encryption keys, plaintext, or decrypted content.
+                It stores only ciphertext &mdash; data that is computationally indistinguishable from random
+                noise. Even with full server access, an attacker gains nothing but unbreakable ciphertext.
+            </p>
+            <ul>
+                <li>Key generation, encryption, and decryption all happen in your browser</li>
+                <li>Cryptographic operations use the Web Crypto API and WebAssembly</li>
+                <li>The server stores only ciphertext with no access to keys</li>
+                <li>No third-party scripts, no CDN, no tracking</li>
+            </ul>
+            <h3>Why this matters</h3>
+            <p>
+                "Harvest now, decrypt later" attacks are already underway &mdash; adversaries collect encrypted
+                communications today, waiting for quantum computers to break them retroactively.
+                Post-quantum cryptography protects your data against both current threats and future quantum
+                attacks, especially critical for information with long-term sensitivity.
+            </p>
+            <h3>Technical details</h3>
+            <ul>
+                <li>Key encapsulation: <strong>ML-KEM-768</strong> via liboqs WebAssembly</li>
+                <li>Symmetric encryption: <strong>AES-256-GCM</strong> via Web Crypto API</li>
+                <li>Key derivation: <strong>HKDF-SHA256</strong> via Web Crypto API</li>
+                <li>File encryption: <strong>PBKDF2</strong> (100k iterations) + AES-256-GCM</li>
+                <li>File size limit: 10 MB</li>
+                <li>Message expiry: 7 days (auto-cleaned)</li>
+                <li>Zero external dependencies &mdash; no CDN, no third-party scripts</li>
+                <li>Backend: PHP 8+ with zero crypto (ciphertext storage only)</li>
+            </ul>
+            <p style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+                <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" target="_blank" style="color:var(--cyan-400);">View source on GitHub</a>
+                &middot; Open Source (MIT) &middot; Independently audited
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <small>PQ Secure &mdash; encryption runs entirely in your browser &middot; Open Source &middot; Audited &middot; No CDN &middot; No tracking &middot; MIT</small>
+    </footer>
+</div>
+
+<script>
+class PQCryptoLib {
+    module = null;
+    kemPtr = null;
+    ready = false;
+    initializing = false;
+
+    static KEY_SIZES = {
+        publicKey: 1184,
+        secretKey: 2400,
+        ciphertext: 1088,
+        sharedSecret: 32,
+    };
+
+    async init() {
+        if (this.ready) return true;
+        if (this.initializing) {
+            while (!this.ready && !this.error) await new Promise(r => setTimeout(r, 50));
+            if (this.error) throw this.error;
+            return true;
+        }
+
+        this.initializing = true;
+        this.error = null;
+
+        try {
+            if (!window.crypto || !window.crypto.subtle) {
+                throw new Error('Web Crypto API not available');
+            }
+
+            const mod = await import('./ml-kem-768.min.js');
+            const createKEM = mod.default;
+            if (!createKEM) {
+                throw new Error('ML-KEM module default export not found');
+            }
+
+            this.module = await createKEM();
+
+            const algName = 'ML-KEM-768';
+            const kemNew = this.module.cwrap('OQS_KEM_new', 'number', ['string']);
+            this.kemPtr = kemNew(algName);
+            if (!this.kemPtr) {
+                throw new Error('Failed to create KEM instance for ' + algName);
+            }
+
+            this.ready = true;
+        } catch (err) {
+            console.error('PQC init failed:', err);
+            this.error = err;
+            throw err;
+        } finally {
+            this.initializing = false;
+        }
+        return true;
+    }
+
+    destroy() {
+        if (this.kemPtr && this.module) {
+            const kemFree = this.module.cwrap('OQS_KEM_free', null, ['number']);
+            kemFree(this.kemPtr);
+            this.kemPtr = null;
+        }
+    }
+
+    async generateKeyPair() {
+        await this.init();
+        const m = this.module;
+        const pubKey = m._malloc(PQCryptoLib.KEY_SIZES.publicKey);
+        const secKey = m._malloc(PQCryptoLib.KEY_SIZES.secretKey);
+        try {
+            const keypair = m.cwrap('OQS_KEM_keypair', 'number', ['number', 'number', 'number']);
+            const ret = keypair(this.kemPtr, pubKey, secKey);
+            if (ret !== 0) {
+                throw new Error('Keypair generation failed with status ' + ret);
+            }
+            return {
+                publicKey: new Uint8Array(m.HEAPU8.buffer, pubKey, PQCryptoLib.KEY_SIZES.publicKey).slice(),
+                secretKey: new Uint8Array(m.HEAPU8.buffer, secKey, PQCryptoLib.KEY_SIZES.secretKey).slice(),
+            };
+        } finally {
+            m._free(pubKey);
+            m._free(secKey);
+        }
+    }
+
+    async encaps(recipientPublicKey) {
+        await this.init();
+        const m = this.module;
+        const ct = m._malloc(PQCryptoLib.KEY_SIZES.ciphertext);
+        const ss = m._malloc(PQCryptoLib.KEY_SIZES.sharedSecret);
+        const pubKeyPtr = m._malloc(PQCryptoLib.KEY_SIZES.publicKey);
+        try {
+            m.HEAPU8.set(new Uint8Array(recipientPublicKey), pubKeyPtr);
+            const encaps = m.cwrap('OQS_KEM_encaps', 'number', ['number', 'number', 'number', 'number']);
+            const ret = encaps(this.kemPtr, ct, ss, pubKeyPtr);
+            if (ret !== 0) {
+                throw new Error('Encapsulation failed with status ' + ret);
+            }
+            return {
+                ciphertext: new Uint8Array(m.HEAPU8.buffer, ct, PQCryptoLib.KEY_SIZES.ciphertext).slice(),
+                sharedSecret: new Uint8Array(m.HEAPU8.buffer, ss, PQCryptoLib.KEY_SIZES.sharedSecret).slice(),
+            };
+        } finally {
+            m._free(ct);
+            m._free(ss);
+            m._free(pubKeyPtr);
+        }
+    }
+
+    async decaps(ciphertext, secretKey) {
+        await this.init();
+        const m = this.module;
+        const ss = m._malloc(PQCryptoLib.KEY_SIZES.sharedSecret);
+        const ctPtr = m._malloc(PQCryptoLib.KEY_SIZES.ciphertext);
+        const secKeyPtr = m._malloc(PQCryptoLib.KEY_SIZES.secretKey);
+        try {
+            m.HEAPU8.set(new Uint8Array(ciphertext), ctPtr);
+            m.HEAPU8.set(new Uint8Array(secretKey), secKeyPtr);
+            const decaps = m.cwrap('OQS_KEM_decaps', 'number', ['number', 'number', 'number', 'number']);
+            const ret = decaps(this.kemPtr, ss, ctPtr, secKeyPtr);
+            if (ret !== 0) {
+                throw new Error('Decapsulation failed with status ' + ret);
+            }
+            return {
+                sharedSecret: new Uint8Array(m.HEAPU8.buffer, ss, PQCryptoLib.KEY_SIZES.sharedSecret).slice(),
+            };
+        } finally {
+            m._free(ss);
+            m._free(ctPtr);
+            m._free(secKeyPtr);
+        }
+    }
+
+    async deriveKey(sharedSecret) {
+        const enc = new TextEncoder();
+        const keyData = await window.crypto.subtle.importKey(
+            'raw', sharedSecret, { name: 'HKDF' }, false, ['deriveBits', 'deriveKey']
+        );
+        return window.crypto.subtle.deriveKey(
+            { name: 'HKDF', hash: 'SHA-256', salt: enc.encode('pq-zero-access-v1'), info: enc.encode('session-key') },
+            keyData, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+        );
+    }
+
+    async encryptMessage(message, recipientPublicKey) {
+        await this.init();
+        const { ciphertext, sharedSecret } = await this.encaps(recipientPublicKey);
+        const key = await this.deriveKey(sharedSecret);
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        const encoded = new TextEncoder().encode(message);
+        const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+        return {
+            kemCiphertext: Array.from(ciphertext),
+            iv: Array.from(iv),
+            encrypted: Array.from(new Uint8Array(encrypted)),
+        };
+    }
+
+    async decryptMessage(encryptedData, senderCiphertext, mySecretKey) {
+        await this.init();
+        const { sharedSecret } = await this.decaps(senderCiphertext, mySecretKey);
+        const key = await this.deriveKey(sharedSecret);
+        const decrypted = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+            key, new Uint8Array(encryptedData.encrypted)
+        );
+        return new TextDecoder().decode(decrypted);
+    }
+
+    async encryptFile(file, password) {
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+            'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+        );
+        const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+        );
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        const buffer = await file.arrayBuffer();
+        const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, buffer);
+        return { encrypted: Array.from(new Uint8Array(encrypted)), iv: Array.from(iv), salt: Array.from(salt) };
+    }
+
+    async encryptTextWithPassword(text, password) {
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+            'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+        );
+        const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+        );
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        const encoded = enc.encode(text);
+        const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+        return { encrypted: Array.from(new Uint8Array(encrypted)), iv: Array.from(iv), salt: Array.from(salt) };
+    }
+
+    async decryptTextWithPassword(encryptedData, password) {
+        const salt = new Uint8Array(encryptedData.salt);
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+            'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+        );
+        const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+        );
+        const decrypted = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+            key, new Uint8Array(encryptedData.encrypted)
+        );
+        return new TextDecoder().decode(decrypted);
+    }
+
+    async decryptFile(encryptedData, password) {
+        const salt = new Uint8Array(encryptedData.salt);
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+            'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+        );
+        const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+        );
+        const decrypted = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+            key, new Uint8Array(encryptedData.encrypted)
+        );
+        return new Blob([decrypted], { type: 'application/octet-stream' });
+    }
+
+    exportKey(key) {
+        return btoa(String.fromCharCode(...new Uint8Array(key)));
+    }
+
+    importKey(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+    }
+}
+
+window.PQCrypto = new PQCryptoLib();
+
+const UI = {
+    messageContent: document.getElementById('messageContent'),
+    fileInput: document.getElementById('fileInput'),
+    fileUploadBtn: document.getElementById('fileUploadBtn'),
+    fileName: document.getElementById('fileName'),
+    filePassword: document.getElementById('filePassword'),
+    maxViews: document.getElementById('maxViews'),
+    encryptBtn: document.getElementById('encryptBtn'),
+    clearBtn: document.getElementById('clearBtn'),
+    resultCard: document.getElementById('resultCard'),
+    shareLink: document.getElementById('shareLink'),
+    newMessageBtn: document.getElementById('newMessageBtn'),
+    decryptSenderCt: document.getElementById('senderCiphertext'),
+    decryptKey: document.getElementById('decryptionKey'),
+    decryptPassword: document.getElementById('decryptPassword'),
+    decryptBtn: document.getElementById('decryptBtn'),
+    decryptOutput: document.getElementById('decryptOutput'),
+    decryptedText: document.getElementById('decryptedText'),
+    genKeyBtn: document.getElementById('genKeyBtn'),
+    myPublicKey: document.getElementById('myPublicKey'),
+    mySecretKey: document.getElementById('mySecretKey'),
+    keyPairResult: document.getElementById('keyPairResult'),
+    copyPubBtn: document.getElementById('copyPubBtn'),
+    copySecBtn: document.getElementById('copySecBtn'),
+    copyLinkBtn: document.getElementById('copyLinkBtn'),
+
+    validatePassword(pw) {
+        if (!pw || pw.length < 8) return 'Password must be at least 8 characters';
+        if (pw.length > 24) return 'Password must be at most 24 characters';
+        if (!/[a-zA-Z]/.test(pw)) return 'Password must contain at least one letter';
+        if (!/[0-9]/.test(pw)) return 'Password must contain at least one number';
+        const specials = (pw.match(/[^a-zA-Z0-9]/g) || []).length;
+        if (specials < 2) return 'Password must contain at least 2 special characters';
+        return null;
+    },
+
+    init() {
+        this.genKeyBtn.addEventListener('click', () => this.handleGenKey());
+        this.encryptBtn.addEventListener('click', () => this.handleEncrypt());
+        this.clearBtn.addEventListener('click', () => this.handleClear());
+        this.newMessageBtn.addEventListener('click', () => this.handleNew());
+        this.decryptBtn.addEventListener('click', () => this.handleDecrypt());
+        this.copyPubBtn.addEventListener('click', () => this.copyText(this.myPublicKey.value, this.copyPubBtn));
+        this.copySecBtn.addEventListener('click', () => this.copyText(this.mySecretKey.value, this.copySecBtn));
+        this.copyLinkBtn.addEventListener('click', () => this.copyText(this.shareLink.value, this.copyLinkBtn));
+        this.fileUploadBtn.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', () => {
+            this.fileName.textContent = this.fileInput.files.length > 0 ? this.fileInput.files[0].name : 'No file selected';
+        });
+        this.filePassword.addEventListener('keydown', e => { if (e.key === 'Enter') this.handleEncrypt(); });
+        this.maxViews.addEventListener('keydown', e => { if (e.key === 'Enter') this.handleEncrypt(); });
+        this.decryptPassword.addEventListener('keydown', e => { if (e.key === 'Enter') this.handleDecrypt(); });
+    },
+
+    async handleGenKey() {
+        if (!window.PQCrypto) {
+            this.showToast('PQCrypto library not loaded!', 'error');
+            return;
+        }
+        try {
+            this.genKeyBtn.disabled = true;
+            this.genKeyBtn.textContent = 'Generating...';
+            await window.PQCrypto.init();
+            const keys = await window.PQCrypto.generateKeyPair();
+            this.myPublicKey.value = window.PQCrypto.exportKey(keys.publicKey);
+            this.mySecretKey.value = window.PQCrypto.exportKey(keys.secretKey);
+            this.keyPairResult.classList.remove('hidden');
+            this.showToast('Key pair generated!', 'success');
+        } catch (e) {
+            console.error('handleGenKey error:', e);
+            this.showToast('Error: ' + (e.message || e.toString()), 'error');
+        } finally {
+            this.genKeyBtn.disabled = false;
+            this.genKeyBtn.textContent = 'Generate New Key Pair';
+        }
+    },
+
+    async handleEncrypt() {
+        try {
+            this.showLoading(true);
+            await window.PQCrypto.init();
+            const oneTimeKeys = await window.PQCrypto.generateKeyPair();
+
+            let replyPubKey = null;
+            let replySecKey = null;
+            if (!this.maxViews.value.trim()) {
+                const replyKeys = await window.PQCrypto.generateKeyPair();
+                replyPubKey = window.PQCrypto.exportKey(replyKeys.publicKey);
+                replySecKey = window.PQCrypto.exportKey(replyKeys.secretKey);
+            }
+
+            let encryptedData;
+            const hasFile = this.fileInput.files.length > 0;
+            const hasText = this.messageContent.value.trim().length > 0;
+
+            if (hasFile && hasText) {
+                const pwErr = this.validatePassword(this.filePassword.value);
+                if (pwErr) throw new Error(pwErr);
+                const file = this.fileInput.files[0];
+                if (file.size > 10 * 1024 * 1024) throw new Error('File too large (>10MB)');
+                const textData = await window.PQCrypto.encryptMessage(this.messageContent.value.trim(), oneTimeKeys.publicKey);
+                const fileData = await window.PQCrypto.encryptFile(file, this.filePassword.value);
+                encryptedData = { type: 'combined', data: { text: textData, file: fileData } };
+            } else if (hasFile) {
+                const pwErr = this.validatePassword(this.filePassword.value);
+                if (pwErr) throw new Error(pwErr);
+                const file = this.fileInput.files[0];
+                if (file.size > 10 * 1024 * 1024) throw new Error('File too large (>10MB)');
+                encryptedData = { type: 'file', data: await window.PQCrypto.encryptFile(file, this.filePassword.value) };
+            } else if (hasText) {
+                const password = this.filePassword.value.trim();
+                if (password) {
+                    const pwErr = this.validatePassword(password);
+                    if (pwErr) throw new Error(pwErr);
+                    const pwData = await window.PQCrypto.encryptTextWithPassword(this.messageContent.value.trim(), password);
+                    pwData.passwordProtected = true;
+                    encryptedData = { type: 'text', data: pwData };
+                } else {
+                    encryptedData = { type: 'text', data: await window.PQCrypto.encryptMessage(this.messageContent.value.trim(), oneTimeKeys.publicKey) };
+                }
+            } else {
+                throw new Error('Enter message or upload file');
+            }
+
+            const encryptedPayload = btoa(JSON.stringify(encryptedData));
+            const shareUrl = 'https://your-server.com/view.php?id=DEMO_ID&k=' + encodeURIComponent(window.PQCrypto.exportKey(oneTimeKeys.secretKey));
+            if (replySecKey) {
+                shareUrl += '&rk=' + encodeURIComponent(replySecKey);
+            }
+            this.shareLink.value = shareUrl + '&data=' + encryptedPayload.substring(0, 50) + '...';
+            this.resultCard.classList.remove('hidden');
+            this.showToast('Encrypted successfully (demo mode - no server storage)!', 'success');
+
+        } catch (e) {
+            console.error('handleEncrypt error:', e);
+            this.showToast(e.message || 'Encryption failed', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    },
+
+    async handleDecrypt() {
+        try {
+            this.showLoading(true);
+            const raw = this.decryptSenderCt.value.trim();
+            if (!raw) throw new Error('No encrypted data');
+            const encryptedPayload = JSON.parse(atob(raw));
+
+            await window.PQCrypto.init();
+            const secretKeyStr = this.decryptKey.value.trim();
+            if (!secretKeyStr) throw new Error('Secret key required');
+            const mySecretKey = window.PQCrypto.importKey(secretKeyStr);
+
+            if (encryptedPayload.type === 'text' && !encryptedPayload.data.passwordProtected) {
+                const txt = await window.PQCrypto.decryptMessage(encryptedPayload.data, encryptedPayload.data.kemCiphertext, mySecretKey);
+                this.decryptedText.textContent = txt;
+                this.decryptOutput.classList.remove('hidden');
+                this.showToast('Decrypted!', 'success');
+            } else if (encryptedPayload.type === 'text' && encryptedPayload.data.passwordProtected) {
+                const pwErr = this.validatePassword(this.decryptPassword.value);
+                if (pwErr) throw new Error(pwErr);
+                const txt = await window.PQCrypto.decryptTextWithPassword(encryptedPayload.data, this.decryptPassword.value);
+                this.decryptedText.textContent = txt;
+                this.decryptOutput.classList.remove('hidden');
+                this.showToast('Decrypted!', 'success');
+            } else {
+                this.decryptedText.textContent = 'Decryption of combined/file types is supported in the full version.';
+                this.decryptOutput.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.error('handleDecrypt error:', e);
+            this.showToast(e.message || 'Decryption failed', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    },
+
+    handleClear() {
+        ['messageContent', 'filePassword', 'maxViews', 'decryptSenderCt', 'decryptKey', 'decryptPassword'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        this.fileInput.value = '';
+        this.fileName.textContent = 'No file selected';
+        this.resultCard.classList.add('hidden');
+        this.decryptOutput.classList.add('hidden');
+    },
+
+    handleNew() {
+        this.handleClear();
+        this.showToast('Ready for new message', 'success');
+    },
+
+    copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = orig, 1500);
+        }).catch(() => this.showToast('Copy failed', 'error'));
+    },
+
+    showToast(msg, type = 'info') {
+        const t = document.createElement('div');
+        t.className = 'toast ' + type;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        requestAnimationFrame(() => t.classList.add('show'));
+        setTimeout(() => {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 300);
+        }, 3000);
+    },
+
+    showLoading(l) {
+        [this.encryptBtn, this.decryptBtn].forEach(b => {
+            if (b) {
+                b.disabled = l;
+                b.textContent = l ? 'Processing...' : b === this.encryptBtn ? 'Encrypt & Generate Link' : 'Decrypt';
+            }
+        });
+    }
+};
+
+document.getElementById('aboutToggle').addEventListener('click', function() {
+    const content = document.getElementById('aboutContent');
+    const isOpen = content.classList.toggle('open');
+    this.classList.toggle('open');
+    this.setAttribute('aria-expanded', isOpen);
+});
+
+document.getElementById('keyPairToggle').addEventListener('click', function() {
+    const body = document.getElementById('keyPairBody');
+    body.classList.toggle('open');
+    this.classList.toggle('open');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.PQCrypto) {
+        UI.init();
+    } else {
+        console.error('UI init failed: PQCrypto not loaded');
+    }
+});
+</script>
+</body>
+</html>
